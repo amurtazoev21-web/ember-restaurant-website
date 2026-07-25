@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember — Fine Dining Experience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --char:#0c0b09;--cream:#f5ede0;--amber:#d4722a;--amber-pale:#f8ece0;
+    --gold:#c8a96e;--muted:#8a7e72;--line:rgba(200,169,110,.2);
+  }
+  html{scroll-behavior:smooth;overflow-x:hidden}
+  body{background:var(--char);color:var(--cream);font-family:'Jost',sans-serif;cursor:none;overflow-x:hidden}
+
+  /* CURSOR */
+  #c1{position:fixed;width:8px;height:8px;background:var(--amber);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+  #c2{position:fixed;width:32px;height:32px;border:1px solid rgba(212,114,42,.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .2s ease}
+
+  /* NAV */
+  nav{position:fixed;top:0;width:100%;z-index:100;padding:2rem 5rem;display:flex;justify-content:space-between;align-items:center}
+  .nav-bg{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(12,11,9,.98),transparent);pointer-events:none}
+  .logo{position:relative;font-family:'Libre Baskerville',serif;font-size:2rem;letter-spacing:.08em;color:var(--gold)}
+  .nav-center{position:relative;display:flex;gap:3rem;list-style:none}
+  .nav-center a{color:var(--cream);text-decoration:none;font-size:.72rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;opacity:.55;transition:opacity .3s,color .3s}
+  .nav-center a:hover{opacity:1;color:var(--gold)}
+  .nav-res{position:relative;border:1px solid rgba(200,169,110,.5);color:var(--gold);padding:.55rem 1.5rem;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:all .3s}
+  .nav-res:hover{background:var(--gold);color:var(--char)}
+
+  /* HERO */
+  #hero{position:relative;height:100vh;display:flex;align-items:flex-end;overflow:hidden}
+  .hero-img{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1920&q=85') center/cover;transform-origin:center;animation:zoomBg 20s ease-in-out infinite alternate}
+  @keyframes zoomBg{from{transform:scale(1)}to{transform:scale(1.06)}}
+  .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(12,11,9,.97) 0%,rgba(12,11,9,.5) 50%,rgba(12,11,9,.2) 100%)}
+  .hero-side-text{position:absolute;right:3rem;top:50%;transform:translateY(-50%) rotate(90deg);font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);opacity:.5}
+  .hero-content{position:relative;z-index:2;padding:0 5rem 6rem;width:100%}
+  .hero-year{font-size:.65rem;letter-spacing:.4em;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:1.5rem}
+  .hero-title{font-family:'Libre Baskerville',serif;font-size:clamp(5rem,11vw,13rem);line-height:.9;font-weight:400;letter-spacing:-.02em;margin-bottom:1.5rem}
+  .hero-title em{font-style:italic;color:var(--gold)}
+  .hero-row{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem}
+  .hero-tagline{font-size:1rem;font-weight:200;opacity:.55;max-width:360px;line-height:1.8;letter-spacing:.04em}
+  .hero-awards{display:flex;gap:3rem;align-items:center}
+  .award-item{text-align:center}
+  .award-icon{font-size:1.5rem;margin-bottom:.25rem}
+  .award-text{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;opacity:.4}
+  .hero-cta{display:flex;gap:1.5rem;align-items:center}
+  .btn-amber{background:var(--amber);color:#fff;padding:1rem 2.5rem;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:all .3s;font-weight:400}
+  .btn-amber:hover{background:var(--gold);transform:translateY(-2px)}
+
+  /* SECTION BASE */
+  section{padding:8rem 5rem}
+  .sl{font-size:.65rem;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:1.5rem}
+  .st{font-family:'Libre Baskerville',serif;font-size:clamp(2.5rem,4.5vw,5rem);font-weight:400;line-height:1.05;margin-bottom:1.5rem}
+  .st em{font-style:italic;color:var(--gold)}
+
+  /* PHILOSOPHY */
+  #philosophy{background:var(--char)}
+  .phil-grid{display:grid;grid-template-columns:1fr 1fr;gap:8rem;align-items:center}
+  .phil-img{width:100%;height:580px;object-fit:cover;filter:contrast(1.05) saturate(.9)}
+  .phil-text p{font-size:.95rem;font-weight:300;line-height:2;opacity:.6;margin-bottom:1.5rem;letter-spacing:.03em}
+  .phil-sep{width:50px;height:1px;background:var(--gold);margin:2.5rem 0;opacity:.4}
+  .phil-quote{font-family:'Libre Baskerville',serif;font-size:1.4rem;font-style:italic;color:var(--gold);line-height:1.6;opacity:.8}
+
+  /* MENU */
+  #menu{background:#0f0e0b}
+  .menu-header{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:end;margin-bottom:5rem}
+  .menu-tabs{display:flex;gap:0;border:1px solid var(--line);width:fit-content;margin-bottom:4rem}
+  .tab{padding:.6rem 2rem;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;cursor:none;transition:all .3s;opacity:.5}
+  .tab.active{background:var(--gold);color:var(--char);opacity:1}
+  .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .menu-item{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:2.5rem;transition:background .3s;position:relative}
+  .menu-item:nth-child(even){border-right:none}
+  .menu-item:hover{background:rgba(200,169,110,.04)}
+  .mi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem}
+  .mi-name{font-family:'Libre Baskerville',serif;font-size:1.1rem;font-weight:400}
+  .mi-price{font-size:.95rem;color:var(--gold);font-weight:300}
+  .mi-desc{font-size:.8rem;opacity:.45;line-height:1.8;font-weight:300;letter-spacing:.03em}
+  .mi-tag{display:inline-block;margin-top:.75rem;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);border:1px solid rgba(212,114,42,.3);padding:.2rem .6rem}
+
+  /* GALLERY */
+  #gallery{background:var(--char)}
+  .gallery-flex{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:6px;margin-top:4rem}
+  .gf-col{display:flex;flex-direction:column;gap:6px}
+  .gf-item{overflow:hidden;position:relative;flex:1}
+  .gf-item img{width:100%;height:100%;object-fit:cover;transition:transform .7s ease,filter .4s}
+  .gf-item:hover img{transform:scale(1.07);filter:brightness(1.1)}
+
+  /* EXPERIENCE */
+  #experience{background:#0f0e0b}
+  .exp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin-top:5rem}
+  .exp-card{background:#0f0e0b;padding:4rem 3rem;text-align:center;position:relative;overflow:hidden}
+  .exp-card::before{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:1px;background:var(--gold);transition:width .5s}
+  .exp-card:hover::before{width:80%}
+  .exp-num{font-family:'Libre Baskerville',serif;font-size:4.5rem;color:var(--gold);opacity:.2;font-style:italic;line-height:1;margin-bottom:1rem}
+  .exp-title{font-family:'Libre Baskerville',serif;font-size:1.3rem;margin-bottom:1rem}
+  .exp-desc{font-size:.82rem;opacity:.45;line-height:1.9;font-weight:300}
+
+  /* TESTIMONIALS */
+  #testimonials{background:var(--char)}
+  .testi-layout{display:grid;grid-template-columns:1fr 2fr;gap:6rem;align-items:start;margin-top:4rem}
+  .testi-featured{background:rgba(200,169,110,.05);border:1px solid var(--line);padding:3rem}
+  .tf-quote{font-family:'Libre Baskerville',serif;font-size:1.5rem;font-style:italic;line-height:1.65;margin-bottom:2rem;color:rgba(245,237,224,.8)}
+  .tf-author{display:flex;align-items:center;gap:1rem}
+  .tf-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover}
+  .tf-name{font-size:.9rem;font-weight:500}
+  .tf-role{font-size:.7rem;opacity:.4;letter-spacing:.1em;text-transform:uppercase}
+  .testi-list{display:flex;flex-direction:column;gap:2rem}
+  .tl-item{border-bottom:1px solid var(--line);padding-bottom:2rem}
+  .tl-stars{color:var(--gold);font-size:.75rem;letter-spacing:.2em;margin-bottom:.75rem}
+  .tl-text{font-size:.85rem;opacity:.55;line-height:1.85;font-weight:300;font-style:italic;margin-bottom:.75rem}
+  .tl-name{font-size:.78rem;font-weight:500;opacity:.6;letter-spacing:.1em}
+
+  /* CONTACT */
+  #contact{background:#0f0e0b}
+  .contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:6rem}
+  .contact-left p{font-size:.95rem;font-weight:300;opacity:.55;line-height:1.9;margin-bottom:3rem}
+  .hours-list{margin-bottom:3rem}
+  .h-row{display:flex;justify-content:space-between;padding:.75rem 0;border-bottom:1px solid var(--line);font-size:.82rem;opacity:.6}
+  .h-row:first-child{border-top:1px solid var(--line)}
+  .h-day{letter-spacing:.08em}
+  .contact-form{display:flex;flex-direction:column;gap:1.2rem}
+  .cfi{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(200,169,110,.25);color:var(--cream);padding:.9rem 0;font-family:'Jost',sans-serif;font-size:.9rem;font-weight:300;outline:none;transition:border-color .3s;letter-spacing:.06em}
+  .cfi::placeholder{opacity:.35;font-size:.85rem}
+  .cfi:focus{border-bottom-color:var(--gold)}
+  .cfi-ta{height:100px;resize:none;border:1px solid rgba(200,169,110,.2);padding:.9rem 1rem;background:transparent;border-bottom:1px solid rgba(200,169,110,.25)}
+
+  /* FOOTER */
+  footer{background:var(--char);border-top:1px solid var(--line);padding:3rem 5rem;display:flex;justify-content:space-between;align-items:center}
+  .footer-logo{font-family:'Libre Baskerville',serif;font-size:1.8rem;color:var(--gold)}
+  footer p{font-size:.72rem;opacity:.25;letter-spacing:.1em}
+
+  /* ANIMATIONS */
+  .reveal{opacity:0;transform:translateY(35px);transition:opacity .9s ease,transform .9s ease}
+  .reveal.vis{opacity:1;transform:translateY(0)}
+  .reveal-l{opacity:0;transform:translateX(-35px);transition:opacity .9s ease,transform .9s ease}
+  .reveal-l.vis{opacity:1;transform:translateX(0)}
+  .reveal-r{opacity:0;transform:translateX(35px);transition:opacity .9s ease,transform .9s ease}
+  .reveal-r.vis{opacity:1;transform:translateX(0)}
+
+  @media(max-width:768px){
+    nav{padding:1.5rem 2rem}
+    .nav-center{display:none}
+    section{padding:5rem 2rem}
+    .hero-content{padding:0 2rem 5rem}
+    .hero-row{flex-direction:column;align-items:flex-start}
+    .hero-awards{display:none}
+    .phil-grid,.menu-header,.contact-layout,.testi-layout{grid-template-columns:1fr}
+    .menu-grid{grid-template-columns:1fr}
+    .menu-item{border-right:none}
+    .gallery-flex{grid-template-columns:1fr 1fr}
+    .exp-grid{grid-template-columns:1fr}
+    footer{flex-direction:column;gap:1rem;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<div id="c1"></div>
+<div id="c2"></div>
+
+<nav>
+  <div class="nav-bg"></div>
+  <div class="logo">EMBER</div>
+  <ul class="nav-center">
+    <li><a href="#philosophy">Story</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#testimonials">Press</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-res">Reserve a Table</a>
+</nav>
+
+<section id="hero">
+  <div class="hero-img"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-side-text">Tashkent · Uzbekistan</div>
+  <div class="hero-content">
+    <p class="hero-year">Est. 2017 — Fine Dining</p>
+    <h1 class="hero-title">Where<br>Fire Meets<br><em>Flavour</em></h1>
+    <div class="hero-row">
+      <p class="hero-tagline">An intimate celebration of open-fire cooking, ancient spice routes, and the theatre of the perfect meal.</p>
+      <div class="hero-awards">
+        <div class="award-item"><div class="award-icon">⭐</div><div class="award-text">Michelin Recommended</div></div>
+        <div class="award-item"><div class="award-icon">🏆</div><div class="award-text">Best Fine Dining 2024</div></div>
+        <div class="award-item"><div class="award-icon">🍷</div><div class="award-text">Wine Spectator Award</div></div>
+      </div>
+      <div class="hero-cta">
+        <a href="#contact" class="btn-amber">Reserve Your Table</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="philosophy">
+  <div class="phil-grid">
+    <div class="reveal-l" style="position:relative">
+      <img src="https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?w=800&q=85" alt="Chef at work" class="phil-img">
+    </div>
+    <div class="reveal-r">
+      <p class="sl">Our Philosophy</p>
+      <h2 class="st">Fire is the<br>Oldest <em>Chef</em></h2>
+      <div class="phil-sep"></div>
+      <p>At Ember, we trace the lineage of cooking back to its origins — the primal drama of flame, smoke, and heat. Our kitchen is centred around a custom wood-fired hearth using only native hardwoods sourced from sustainable forests.</p>
+      <p>Our menu evolves with the seasons, built on relationships with farmers within a 200km radius. Every dish tells a story of soil, climate, and craft — elevated by classical technique and daring creativity.</p>
+      <div class="phil-quote">"Cooking is the art of transformation.<br>We transform ingredients into memories."</div>
+    </div>
+  </div>
+</section>
+
+<section id="menu">
+  <div class="menu-header">
+    <div class="reveal-l">
+      <p class="sl">Tasting Menu</p>
+      <h2 class="st">Seasonal<br><em>Signatures</em></h2>
+    </div>
+    <p class="reveal-r" style="font-size:.9rem;font-weight:300;opacity:.55;line-height:1.9">Our tasting menus change with the seasons and the harvest. The following represents our current Summer Collection — eight courses, each a meditation on fire and land.</p>
+  </div>
+  <div class="menu-tabs reveal">
+    <div class="tab active">Tasting Menu</div>
+    <div class="tab">À la Carte</div>
+    <div class="tab">Wine Pairing</div>
+  </div>
+  <div class="menu-grid">
+    <div class="menu-item reveal"><div class="mi-top"><div class="mi-name">Aged Wagyu Striploin</div><div class="mi-price">$68</div></div><p class="mi-desc">45-day dry-aged, wood-fired over cherry oak, served with fermented black garlic, bone marrow butter, and charred leek ash.</p><span class="mi-tag">Signature</span></div>
+    <div class="menu-item reveal"><div class="mi-top"><div class="mi-name">Whole Roasted Turbot</div><div class="mi-price">$74</div></div><p class="mi-desc">Line-caught, roasted whole over vine wood, paired with saffron beurre blanc, pickled fennel, and sea vegetable salad.</p><span class="mi-tag">Seasonal</span></div>
+    <div class="menu-item reveal"><div class="mi-top"><div class="mi-name">Heritage Duck Breast</div><div class="mi-price">$52</div></div><p class="mi-desc">Slow-rendered Moulard duck, pomegranate lacquer, spiced date purée, and a consommé poured tableside.</p></div>
+    <div class="menu-item reveal"><div class="mi-top"><div class="mi-name">Garden Beetroot</div><div class="mi-price">$36</div></div><p class="mi-desc">Roasted in salt crust, served with pistachio labneh, candied walnuts, micro herbs, and cold-pressed flaxseed oil.</p><span class="mi-tag">Vegetarian</span></div>
+    <div class="menu-item reveal"><div class="mi-top"><div class="mi-name">Fire-Baked Lamb Saddle</div><div class="mi-price">$70</div></div><p class="mi-desc">Silk Road spiced, cooked in wood-fire djuvec, served with smoked aubergine cream and sumac-dressed herbs.</p><span class="mi-tag">Chef's Pick</span></div>
+    <div class="menu-item reveal"><div class="mi-top"><div class="mi-name">Chocolate & Smoke</div><div class="mi-price">$24</div></div><p class="mi-desc">76% single-origin dark chocolate tart, smoked caramel, sea salt flakes, and a quenelle of crème fraîche ice cream.</p><span class="mi-tag">Dessert</span></div>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="reveal" style="margin-bottom:4rem">
+    <p class="sl">The Atmosphere</p>
+    <h2 class="st">Where Every<br>Detail <em>Matters</em></h2>
+  </div>
+  <div class="gallery-flex">
+    <div class="gf-col">
+      <div class="gf-item reveal" style="height:400px"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=85" alt="Restaurant interior"></div>
+      <div class="gf-item reveal" style="height:250px"><img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=85" alt="Cocktail bar"></div>
+    </div>
+    <div class="gf-col">
+      <div class="gf-item reveal" style="height:250px"><img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=85" alt="Plated dish"></div>
+      <div class="gf-item reveal" style="height:250px"><img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=600&q=85" alt="Chef cooking"></div>
+      <div class="gf-item reveal" style="height:150px"><img src="https://images.unsplash.com/photo-1510624673408-7a6f41cfc4a5?w=600&q=85" alt="Table setting"></div>
+    </div>
+    <div class="gf-col">
+      <div class="gf-item reveal" style="height:320px"><img src="https://images.unsplash.com/photo-1543353071-873f17a7a088?w=600&q=85" alt="Wine cellar"></div>
+      <div class="gf-item reveal" style="height:330px"><img src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=600&q=85" alt="Dessert plate"></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="reveal"><p class="sl">The Ember Experience</p><h2 class="st">More Than<br>a <em>Meal</em></h2></div>
+  <div class="exp-grid">
+    <div class="exp-card reveal"><div class="exp-num">I</div><div class="exp-title">The Welcome</div><p class="exp-desc">Every guest is greeted by name and guided through an amuse-bouche journey in our lounge before being seated at their private table.</p></div>
+    <div class="exp-card reveal"><div class="exp-num">II</div><div class="exp-title">The Tasting</div><p class="exp-desc">Eight courses, each a story. Our sommelier curates a wine pairing that transforms every bite into a complete sensory narrative.</p></div>
+    <div class="exp-card reveal"><div class="exp-num">III</div><div class="exp-title">The Farewell</div><p class="exp-desc">Guests depart with a hand-crafted menu of the evening and a jar of our house-smoked sea salt — a memory to take home.</p></div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="reveal"><p class="sl">Press & Guests</p><h2 class="st">What They<br><em>Say</em></h2></div>
+  <div class="testi-layout">
+    <div class="testi-featured reveal-l">
+      <p class="tf-quote">"Ember is the most exciting restaurant to open in Central Asia in a decade. The cooking is brave, beautiful, and deeply personal."</p>
+      <div class="tf-author"><img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=100&q=80" alt="" class="tf-avatar"><div><div class="tf-name">Marcus Bellingham</div><div class="tf-role">Food & Travel Magazine</div></div></div>
+    </div>
+    <div class="testi-list reveal-r">
+      <div class="tl-item"><div class="tl-stars">★★★★★</div><p class="tl-text">"An extraordinary evening. The wagyu with cherry oak smoke was a religious experience. Every course more surprising than the last."</p><div class="tl-name">— Aleksandra Novak, Moscow</div></div>
+      <div class="tl-item"><div class="tl-stars">★★★★★</div><p class="tl-text">"The sommelier's wine pairing was impeccable. Ember understands that a great dinner is theatre — and they are masters of their stage."</p><div class="tl-name">— James Whitfield, London</div></div>
+      <div class="tl-item"><div class="tl-stars">★★★★★</div><p class="tl-text">"We celebrated our anniversary here. The detail, the care, the absolute precision of every dish — we've been talking about it for months."</p><div class="tl-name">— Yuki & Hiro Tanaka, Tokyo</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact-layout">
+    <div class="reveal-l">
+      <p class="sl">Find Us</p>
+      <h2 class="st">Reserve Your<br><em>Evening</em></h2>
+      <p style="margin-top:1.5rem;font-size:.95rem;font-weight:300;opacity:.55;line-height:1.9">Reservations are essential. We accommodate parties of two to twelve, with private dining available for larger celebrations.</p>
+      <div class="hours-list">
+        <div class="h-row"><span class="h-day">Tuesday – Thursday</span><span>6:00 PM – 11:00 PM</span></div>
+        <div class="h-row"><span class="h-day">Friday – Saturday</span><span>5:30 PM – 12:00 AM</span></div>
+        <div class="h-row"><span class="h-day">Sunday</span><span>6:00 PM – 10:00 PM</span></div>
+        <div class="h-row"><span class="h-day">Monday</span><span>Closed</span></div>
+      </div>
+      <p style="font-size:.82rem;opacity:.4;letter-spacing:.05em">📍 18 Shota Rustaveli Street, Tashkent<br>📞 +998 71 286 7788</p>
+    </div>
+    <div class="reveal-r">
+      <form class="contact-form" onsubmit="return false">
+        <input class="cfi" type="text" placeholder="Full Name">
+        <input class="cfi" type="email" placeholder="Email Address">
+        <input class="cfi" type="tel" placeholder="Phone Number">
+        <input class="cfi" type="date">
+        <select class="cfi" style="background:transparent;color:var(--cream)"><option value="">Party Size</option><option>2 guests</option><option>3–4 guests</option><option>5–6 guests</option><option>7+ guests (private dining)</option></select>
+        <textarea class="cfi cfi-ta" placeholder="Special requests or dietary requirements..."></textarea>
+        <button type="submit" class="btn-amber" style="border:none;cursor:none;align-self:flex-start;font-family:'Jost',sans-serif;cursor:pointer">Confirm Reservation</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">EMBER</div>
+  <p>© 2025 Ember Fine Dining · All rights reserved</p>
+  <p style="font-size:.65rem;opacity:.2;letter-spacing:.2em">WHERE FIRE MEETS FLAVOUR</p>
+</footer>
+
+<script>
+const c1=document.getElementById('c1'),c2=document.getElementById('c2');
+let mx=0,my=0;
+document.addEventListener('mousemove',e=>{
+  c1.style.left=e.clientX+'px';c1.style.top=e.clientY+'px';
+  setTimeout(()=>{c2.style.left=e.clientX+'px';c2.style.top=e.clientY+'px';},70);
+});
+document.querySelectorAll('a,button,.tab').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{c1.style.transform='translate(-50%,-50%) scale(2)';c2.style.transform='translate(-50%,-50%) scale(1.5)';});
+  el.addEventListener('mouseleave',()=>{c1.style.transform='translate(-50%,-50%) scale(1)';c2.style.transform='translate(-50%,-50%) scale(1)';});
+});
+
+// Tabs
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));this.classList.add('active');});
+});
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');}),{threshold:.1});
+document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el=>obs.observe(el));
+
+// Menu items stagger
+document.querySelectorAll('.menu-item').forEach((el,i)=>el.style.transitionDelay=(i*.08)+'s');
+
+// Parallax hero
+document.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  const img=document.querySelector('.hero-img');
+  if(img)img.style.transform=`scale(1.06) translateY(${y*.3}px)`;
+});
+</script>
+</body>
+</html>
